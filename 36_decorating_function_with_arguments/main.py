@@ -1,8 +1,5 @@
 import functools
 
-user = {'name': 'Joko', 'level': 'user'}
-user = {'name': 'Joko', 'level': 'admin'}
-
 
 def secureAdminPassword(func):
     # Remember always using this function tools when using function decorator
@@ -22,5 +19,10 @@ def getPassword(panel):
         return 'No panel supplied'
 
 
+user = {'name': 'Joko', 'level': 'user'}
+print(getPassword.__name__)
+print(getPassword('admin'))
+
+user = {'name': 'Joko', 'level': 'admin'}
 print(getPassword.__name__)
 print(getPassword('admin'))
