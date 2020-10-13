@@ -7,17 +7,20 @@ user = {'name': 'Joko', 'level': 'admin'}
 def secureAdminPassword(func):
     # Remember always using this function tools when using function decorator
     @functools.wraps(func)
-    def secure():
+    def secure(*args, **kwargs):
         if(user['level'] == 'admin'):
-            return func()
+            return func(*args, **kwargs)
     return secure
 
 
 # @<name_of_method_decorator>
 @secureAdminPassword
-def getAdminPassword():
-    return '12345'
+def getPassword(panel):
+    if panel == 'admin':
+        return '12345'
+    else:
+        return 'No panel supplied'
 
 
-print(getAdminPassword.__name__)
-print(getAdminPassword())
+print(getPassword.__name__)
+print(getPassword('admin'))
