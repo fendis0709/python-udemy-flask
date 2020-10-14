@@ -1,13 +1,12 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
 students = [
     {
+        'id': 1,
         'name': 'Joko',
-        'gender': 'Male',
-        'class': 'XII - A 1',
         'grades': [
             {
                 'name': 'mathematic',
@@ -41,14 +40,26 @@ def getStudent():
 # GET : {host}/students/<int:id>
 @app.route('/students/<int:id>')
 def getStudentDetail(id):
-    return f'student-detail:{id}'
+    # return f'student-detail:{id}'
+    detail = None
+    for student in students:
+        if id == student['id']:
+            detail = student
+    return jsonify({
+        'student': detail
+    })
 
 
 # Register new student
 # POST : {host}/students
 @app.route('/students', methods=['POST'])
 def registerStudent():
-    return 'student-register'
+    # return 'student-register'
+    student = request.json
+    students.append(student)
+    return jsonify({
+        'students': students
+    })
 
 
 # Update student
