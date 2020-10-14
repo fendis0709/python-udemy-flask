@@ -56,6 +56,7 @@ def getStudentDetail(id):
 def registerStudent():
     # return 'student-register'
     student = request.json
+    student['id'] = len(students) + 1
     students.append(student)
     return jsonify({
         'students': students
