@@ -24,11 +24,26 @@ class Student(Resource):
         return {
             'student': student
         }, 200 if student else 404
-    
+
+    # Update student by ID
+    @jwt_required()
+    def put(self, id):
+        data = request.get_json()
+        student = next(
+            filter(lambda student: student['id'] == id, students), None)
+        if student:
+            student.update({
+                'id': student['id'],
+                'name': data['name']
+            })
+        return {
+            'student': student
+        }
+
     # Delete student by ID
     @jwt_required()
     def delete(self, id):
-        global students # Use global to avoid re-assignment error
+        global students  # Use global to avoid re-assignment error
         students = list(filter(lambda student: student['id'] != id, students))
         return {
             'students': students
