@@ -1,8 +1,13 @@
+from auth import authenticate, identity
 from flask import Flask, request
+from flask_jwt import JWT, jwt_required
 from flask_restful import Resource, Api
 
 app = Flask(__name__)
+app.secret_key = 'helloworld'
 api = Api(app)
+
+JWT(app=app, authentication_handler=authenticate, identity_handler=identity)
 
 students = [
     {
@@ -14,6 +19,7 @@ students = [
 
 class Student(Resource):
     # Find student by ID
+    @jwt_required()
     def get(self, id):
         student = next(filter(lambda student: student['id'] == id, students), None)
         return {
