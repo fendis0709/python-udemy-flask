@@ -15,14 +15,10 @@ students = [
 class Student(Resource):
     # Find student by ID
     def get(self, id):
-        for student in students:
-            if student['id'] == id:
-                return {
-                    'student': student
-                }, 200
+        student = next(filter(lambda student: student['id'] == id, students), None)
         return {
-            'student': None
-        }, 404
+            'student': student
+        }, 200 if student else 404
 
 
 class Students(Resource):
