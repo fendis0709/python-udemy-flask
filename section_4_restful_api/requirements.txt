@@ -11,6 +11,7 @@ contextlib2==0.6.0
 distlib==0.3.0
 distro==1.4.0
 Flask==1.1.2
+Flask-JWT==0.3.2
 Flask-RESTful==0.3.8
 html5lib==1.0.1
 idna==2.8
@@ -27,8 +28,10 @@ packaging==20.3
 pep517==0.8.2
 progress==1.5
 pycodestyle==2.6.0
+PyJWT==1.4.2
 pylint==2.6.0
 pyparsing==2.4.6
+python-dotenv==0.14.0
 pytoml==0.1.21
 pytz==2020.1
 requests==2.22.0
