@@ -19,12 +19,20 @@ students = [
 
 class Student(Resource):
     # Find student by ID
-    @jwt_required()
     def get(self, id):
         student = next(filter(lambda student: student['id'] == id, students), None)
         return {
             'student': student
         }, 200 if student else 404
+    
+    # Delete student by ID
+    @jwt_required()
+    def delete(self, id):
+        global students # Use global to avoid re-assignment error
+        students = list(filter(lambda student: student['id'] != id, students))
+        return {
+            'students': students
+        }
 
 
 class Students(Resource):
@@ -35,6 +43,7 @@ class Students(Resource):
         }, 200
 
     # Register new student
+    @jwt_required()
     def post(self):
         data = request.get_json()
         counter = len(students)
