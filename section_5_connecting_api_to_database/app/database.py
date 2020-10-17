@@ -1,6 +1,7 @@
+import os
 import sqlite3
 
-connection = sqlite3.connect('./data.db')
+connection = sqlite3.connect(os.path.relpath('data.db'))
 
 createTableUsers = 'CREATE TABLE users (id int, username text, password text)'
 connection.cursor().execute(createTableUsers)
