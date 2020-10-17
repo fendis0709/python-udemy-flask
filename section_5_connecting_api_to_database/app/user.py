@@ -58,6 +58,12 @@ class UserResource(Resource):
     def post(self):
         _input = UserResource.parser.parse_args()
 
+        user = User.findByUsername(_input['username'])
+        if user :
+            return {
+                'message': f"A user with username '{_input['username']}' already exists"
+            }, 400
+
         connection = sqlite3.connect('data.db')
 
         insert  = "INSERT INTO users VALUES (NULL, ?, ?)"
