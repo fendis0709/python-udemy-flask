@@ -2,6 +2,7 @@ from auth import authenticate, identity
 from flask import Flask, request
 from flask_jwt import JWT, jwt_required
 from flask_restful import Resource, Api
+from user import UserResource
 
 app = Flask(__name__)
 app.secret_key = 'helloworld'
@@ -74,6 +75,7 @@ class Students(Resource):
 
 api.add_resource(Students, '/students')
 api.add_resource(Student, '/students/<int:id>')
+api.add_resource(UserResource, '/users')
 
 
 app.run()
