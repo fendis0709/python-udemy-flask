@@ -51,10 +51,17 @@ class Student(Resource):
     # Delete student by ID
     @jwt_required()
     def delete(self, id):
-        global students  # Use global to avoid re-assignment error
-        students = list(filter(lambda student: student['id'] != id, students))
+        connection = sqlite3.connect('data.db')
+
+        query = 'DELETE FROM students WHERE id=?'
+        connection.cursor().execute(query, (id, ))
+
+        connection.commit()
+
+        connection.close()
+
         return {
-            'students': students
+            'message': 'Student successfully deleted'
         }
 
 
@@ -70,9 +77,9 @@ class Students(Resource):
     def get(self):
         connection = sqlite3.connect('data.db')
 
-        query   = 'SELECT * FROM students ORDER BY name'
-        result  = connection.cursor().execute(query)
-        rows    = result.fetchmany()
+        query = 'SELECT * FROM students ORDER BY name'
+        result = connection.cursor().execute(query)
+        rows = result.fetchmany()
 
         connection.close()
 
