@@ -13,6 +13,13 @@ students = [
 
 
 class Student(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('name',
+                        type=str,
+                        required=True,
+                        help='This field is required'
+                        )
+
     # Find student by ID
     def get(self, id):
         connection = sqlite3.connect('data.db')
@@ -36,16 +43,19 @@ class Student(Resource):
     # Update student by ID
     @jwt_required()
     def put(self, id):
-        data = request.get_json()
-        student = next(
-            filter(lambda student: student['id'] == id, students), None)
-        if student:
-            student.update({
-                'id': student['id'],
-                'name': data['name']
-            })
+        _input = Student.parser.parse_args()
+
+        connection = sqlite3.connect('data.db')
+
+        query = 'UPDATE students SET name = ? WHERE id = ?'
+        connection.cursor().execute(query, (_input['name'], id))
+
+        connection.commit()
+
+        connection.close()
+
         return {
-            'student': student
+            'message': 'Student successfully updated'
         }
 
     # Delete student by ID
