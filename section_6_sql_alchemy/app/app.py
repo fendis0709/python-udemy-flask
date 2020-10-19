@@ -3,8 +3,8 @@ from datetime import timedelta
 from flask import Flask, jsonify
 from flask_jwt import JWT
 from flask_restful import Api
-from user import UserResource
-from student import Student, Students
+from resources.user import UserResource
+from resources.student import Student, Students
 
 
 app = Flask(__name__)
