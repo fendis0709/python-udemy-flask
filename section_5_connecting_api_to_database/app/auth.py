@@ -1,8 +1,8 @@
 from user import User
 
 
-def authenticate(username, password):
-    user = User.findByUsername(username)
+def authenticate(email, password):
+    user = User.findByEmail(email)
     if user:
         if user.password == password:
             return user
