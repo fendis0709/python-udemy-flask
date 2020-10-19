@@ -1,4 +1,4 @@
-from resources.user import User
+from models.user import User
 
 
 def authenticate(email, password):

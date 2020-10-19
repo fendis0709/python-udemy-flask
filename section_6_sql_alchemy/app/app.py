@@ -4,7 +4,7 @@ from flask import Flask, jsonify
 from flask_jwt import JWT
 from flask_restful import Api
 from resources.user import UserResource
-from resources.student import Student, Students
+from resources.student import StudentResource, StudentsResource
 
 
 app = Flask(__name__)
@@ -31,8 +31,8 @@ def customResponse(accessToken, identity):
 
 
 api = Api(app)
-api.add_resource(Students, '/students')
-api.add_resource(Student, '/students/<int:id>')
+api.add_resource(StudentsResource, '/students')
+api.add_resource(StudentResource, '/students/<int:id>')
 api.add_resource(UserResource, '/users')
 
 app.run()

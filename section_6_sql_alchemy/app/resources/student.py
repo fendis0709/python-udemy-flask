@@ -2,9 +2,10 @@ import sqlite3
 from flask import request
 from flask_jwt import jwt_required
 from flask_restful import Resource, reqparse
+from models.student import Student
 
 
-class Student(Resource):
+class StudentResource(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('name',
                         type=str,
@@ -14,60 +15,45 @@ class Student(Resource):
 
     # Find student by ID
     def get(self, id):
-        connection = sqlite3.connect('data.db')
-
-        querySearch = 'SELECT * FROM students WHERE id = ?'
-        queryResult = connection.cursor().execute(querySearch, (id,))
-
-        result = queryResult.fetchone()
-
-        connection.close()
-
-        if result:
+        student = Student.find(id)
+        if student is None:
             return {
-                'student': result
-            }, 200
+                'message': 'Student not found'
+            }, 404
 
         return {
-            'message': 'No student found'
-        }, 404
+            'student': student._json()
+        }, 200
 
     # Update student by ID
     @jwt_required()
     def put(self, id):
-        _input = Student.parser.parse_args()
+        data = StudentResource.parser.parse_args()
 
-        connection = sqlite3.connect('data.db')
+        student = Student.find(id)
+        if student is None:
+            return {
+                'message': 'Student not found'
+            }, 400
 
-        query = 'UPDATE students SET name = ? WHERE id = ?'
-        connection.cursor().execute(query, (_input['name'], id))
-
-        connection.commit()
-
-        connection.close()
+        student = Student(_id=id, name=data['name'])
+        student.update(id)
 
         return {
             'message': 'Student successfully updated'
-        }
+        }, 200
 
     # Delete student by ID
     @jwt_required()
     def delete(self, id):
-        connection = sqlite3.connect('data.db')
-
-        query = 'DELETE FROM students WHERE id=?'
-        connection.cursor().execute(query, (id, ))
-
-        connection.commit()
-
-        connection.close()
+        Student.delete(id)
 
         return {
             'message': 'Student successfully deleted'
         }
 
 
-class Students(Resource):
+class StudentsResource(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('name',
                         type=str,
@@ -77,13 +63,7 @@ class Students(Resource):
 
     # Get all students
     def get(self):
-        connection = sqlite3.connect('data.db')
-
-        query = 'SELECT * FROM students ORDER BY name'
-        result = connection.cursor().execute(query)
-        rows = result.fetchmany()
-
-        connection.close()
+        rows = Student.get()
 
         students = []
         if rows:
@@ -101,16 +81,10 @@ class Students(Resource):
     # Register new student
     @jwt_required()
     def post(self):
-        _input = Students.parser.parse_args()
+        data = StudentsResource.parser.parse_args()
 
-        connection = sqlite3.connect('data.db')
-
-        insert = 'INSERT INTO students VALUES (NULL, ?)'
-        connection.cursor().execute(insert, (_input['name'],))
-
-        connection.commit()
-
-        connection.close()
+        student = Student(_id=None, name=data['name'])
+        student.insert()
 
         return {
             'message': 'Student created successfully'
