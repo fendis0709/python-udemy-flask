@@ -1,7 +1,7 @@
 import sqlite3
 from flask import request
 from flask_jwt import jwt_required
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 
 
 students = [
@@ -10,6 +10,7 @@ students = [
         'name': 'Joko',
     }
 ]
+
 
 class Student(Resource):
     # Find student by ID
@@ -23,7 +24,7 @@ class Student(Resource):
 
         connection.close()
 
-        if result :
+        if result:
             return {
                 'student': result
             }, 200
@@ -58,22 +59,50 @@ class Student(Resource):
 
 
 class Students(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('name',
+                        type=str,
+                        required=True,
+                        help='This field is required'
+                        )
+
     # Get all students
     def get(self):
+        connection = sqlite3.connect('data.db')
+
+        query   = 'SELECT * FROM students ORDER BY name'
+        result  = connection.cursor().execute(query)
+        rows    = result.fetchmany()
+
+        connection.close()
+
+        students = []
+        if rows:
+            for row in rows:
+                students.append({
+                    'id': row[0],
+                    'name': row[1]
+                })
+
         return {
+            'message': f'There are {len(students)} student(s) found',
             'students': students
         }, 200
 
     # Register new student
     @jwt_required()
     def post(self):
-        data = request.get_json()
-        counter = len(students)
-        student = {
-            'id': counter + 1,
-            'name': data['name'],
-        }
-        students.append(student)
+        _input = Students.parser.parse_args()
+
+        connection = sqlite3.connect('data.db')
+
+        insert = 'INSERT INTO students VALUES (NULL, ?)'
+        connection.cursor().execute(insert, (_input['name'],))
+
+        connection.commit()
+
+        connection.close()
+
         return {
-            'students': students
+            'message': 'Student created successfully'
         }, 201
