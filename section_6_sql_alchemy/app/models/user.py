@@ -1,41 +1,33 @@
 import sqlite3
+from database import db
 
 
-class User:
+class User(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    email = db.Column(db.String(255))
+    password = db.Column(db.String(255))
+
     def __init__(self, _id, name, email, password):
         self.id = _id
         self.name = name
         self.email = email
         self.password = password
 
+    # Menampilkan data berdasarkan id
     @classmethod
-    def findByEmail(cls, email):
-        connection = sqlite3.connect('data.db')
+    def find(cls, _id):
+        return cls.query.filter_by(id=_id).first()
 
-        query = 'SELECT * FROM users WHERE email = ?'
-        result = connection.cursor().execute(query, (email,))
-        result = result.fetchone()
-
-        user = None
-        if result:
-            user = cls(*result)
-
-        connection.close()
-
-        return user
-
+    # Menampilkan data berdasarkan email
     @classmethod
-    def findById(cls, _id):
-        connection = sqlite3.connect('data.db')
+    def find_by_email(cls, email):
+        return cls.query.filter_by(email=email).first()
 
-        query = 'SELECT * FROM users WHERE id = ?'
-        result = connection.cursor().execute(query, (_id,))
-        result = result.fetchone()
-
-        user = None
-        if result:
-            user = cls(*result)
-
-        connection.close()
-
-        return user
+    # Menyimpan data
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return None

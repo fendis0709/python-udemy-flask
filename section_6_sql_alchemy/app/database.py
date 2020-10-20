@@ -1,19 +1,3 @@
-import os
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
 
-connection = sqlite3.connect(os.path.relpath('data.db'))
-
-createTableUsers = 'CREATE TABLE users (id int, username text, password text)'
-connection.cursor().execute(createTableUsers)
-
-userData = (1, "joko", "12345")
-insertUser = 'INSERT INTO users VALUES (?, ?, ?)'
-connection.cursor().execute(insertUser, userData)
-
-getUsers = 'SELECT * FROM users'
-for user in connection.cursor().execute(getUsers):
-    print(user)
-
-connection.commit()
-
-connection.close()
+db = SQLAlchemy()

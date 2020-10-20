@@ -1,5 +1,3 @@
-import os
-import sqlite3
 from flask_restful import Resource, reqparse, request
 from models.user import User
 
@@ -25,21 +23,18 @@ class UserResource(Resource):
     def post(self):
         _input = UserResource.parser.parse_args()
 
-        user = User.findByEmail(_input['email'])
+        user = User.find_by_email(_input['email'])
         if user:
             return {
                 'message': f"A user with email '{_input['email']}' already exists"
             }, 400
 
-        connection = sqlite3.connect('data.db')
-
-        insert = "INSERT INTO users VALUES (NULL, ?, ?, ?)"
-        data = (_input['name'], _input['email'], _input['password'])
-        connection.cursor().execute(insert, data)
-
-        connection.commit()
-
-        connection.close()
+        user = User(_id=None,
+                    name=_input['name'],
+                    email=_input['email'],
+                    password=_input['password']
+                    )
+        user.save()
 
         return {
             'message': 'User successfully created'

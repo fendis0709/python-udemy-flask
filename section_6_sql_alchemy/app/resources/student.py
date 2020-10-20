@@ -1,4 +1,3 @@
-import sqlite3
 from flask import request
 from flask_jwt import jwt_required
 from flask_restful import Resource, reqparse
@@ -36,8 +35,8 @@ class StudentResource(Resource):
                 'message': 'Student not found'
             }, 400
 
-        student = Student(_id=id, name=data['name'])
-        student.update(id)
+        student.name = data['name']
+        student.save()
 
         return {
             'message': 'Student successfully updated'
@@ -68,10 +67,7 @@ class StudentsResource(Resource):
         students = []
         if rows:
             for row in rows:
-                students.append({
-                    'id': row[0],
-                    'name': row[1]
-                })
+                students.append(row._json())
 
         return {
             'message': f'There are {len(students)} student(s) found',
@@ -84,7 +80,7 @@ class StudentsResource(Resource):
         data = StudentsResource.parser.parse_args()
 
         student = Student(_id=None, name=data['name'])
-        student.insert()
+        student.save()
 
         return {
             'message': 'Student created successfully'

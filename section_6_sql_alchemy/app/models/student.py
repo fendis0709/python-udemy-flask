@@ -1,7 +1,13 @@
 import sqlite3
+from database import db
 
 
-class Student:
+class Student(db.Model):
+    __tablename__ = 'students'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+
     def __init__(self, _id: int, name: str):
         self.id = _id
         self.name = name
@@ -16,31 +22,12 @@ class Student:
     # Menampilkan semua data
     @classmethod
     def get(cls):
-        connection = sqlite3.connect('data.db')
-
-        query = 'SELECT * FROM students ORDER BY name'
-        result = connection.cursor().execute(query)
-        rows = result.fetchmany()
-
-        connection.close()
-
-        return rows
+        return Student.query.order_by(cls.name).all()
 
     # Menampilkan data berdasarkan id
     @classmethod
     def find(cls, id: int):
-        connection = sqlite3.connect('data.db')
-
-        query = 'SELECT * FROM students WHERE id = ?'
-        result = connection.cursor().execute(query, (id,))
-        result = result.fetchone()
-
-        connection.close()
-
-        if result:
-            return cls(*result)
-
-        return None
+        return cls.query.filter_by(id=id).first()
 
     # Menambahkan data
     def insert(self):
@@ -68,16 +55,17 @@ class Student:
 
         return None
 
+    # Menyimpan data (Insert & Update)
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+        return None
+
     # Menghapus data berdasarkan id
     @classmethod
     def delete(cls, id: int):
-        connection = sqlite3.connect('data.db')
-
-        query = 'DELETE FROM students WHERE id = ?'
-        connection.cursor().execute(query, (id,))
-
-        connection.commit()
-
-        connection.close()
+        cls.query.filter_by(id=id).delete()
+        db.session.commit()
 
         return None
