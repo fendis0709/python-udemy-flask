@@ -6,6 +6,7 @@ from flask_jwt import JWT
 from flask_restful import Api
 from resources.user import UserResource
 from resources.student import StudentResource, StudentsResource
+from resources.school import SchoolResource, SchoolsResource
 
 
 app = Flask(__name__)
@@ -18,9 +19,11 @@ app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-jwt = JWT(app=app,
-          authentication_handler=authenticate,
-          identity_handler=identity)
+jwt = JWT(
+    app=app,
+    authentication_handler=authenticate,
+    identity_handler=identity
+)
 
 
 @jwt.auth_response_handler
@@ -45,6 +48,8 @@ def custom_error_handler(error):
 api = Api(app)
 api.add_resource(StudentsResource, '/students')
 api.add_resource(StudentResource, '/students/<int:id>')
+api.add_resource(SchoolsResource, '/schools')
+api.add_resource(SchoolResource, '/schools/<int:id>')
 api.add_resource(UserResource, '/users')
 
 db.init_app(app)

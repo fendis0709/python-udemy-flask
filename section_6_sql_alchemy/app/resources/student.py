@@ -6,21 +6,30 @@ from models.student import Student
 
 class StudentResource(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('name',
-                        type=str,
-                        required=True,
-                        help='This field is required'
-                        )
+    parser.add_argument(
+        'name',
+        type=str,
+        required=True,
+        help='This field is required'
+    )
+    parser.add_argument(
+        'school_id',
+        type=int,
+        required=True,
+        help='This field is required'
+    )
 
     # Find student by ID
     def get(self, id):
         student = Student.find(id)
         if student is None:
             return {
-                'message': 'Student not found'
+                'code': 404,
+                'message': 'Student data not found'
             }, 404
 
         return {
+            'code': 200,
             'student': student._json()
         }, 200
 
@@ -32,14 +41,17 @@ class StudentResource(Resource):
         student = Student.find(id)
         if student is None:
             return {
-                'message': 'Student not found'
+                'code': 400,
+                'message': 'Student data not found'
             }, 400
 
         student.name = data['name']
+        student.school_id = data['school_id']
         student.save()
 
         return {
-            'message': 'Student successfully updated'
+            'code': 200,
+            'message': 'Student data successfully updated'
         }, 200
 
     # Delete student by ID
@@ -48,30 +60,32 @@ class StudentResource(Resource):
         Student.delete(id)
 
         return {
-            'message': 'Student successfully deleted'
-        }
+            'code': 200,
+            'message': 'Student data successfully deleted'
+        }, 200
 
 
 class StudentsResource(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('name',
-                        type=str,
-                        required=True,
-                        help='This field is required'
-                        )
+    parser.add_argument(
+        'name',
+        type=str,
+        required=True,
+        help='This field is required'
+    )
+    parser.add_argument(
+        'school_id',
+        type=int,
+        required=True,
+        help='This field is required'
+    )
 
     # Get all students
     def get(self):
-        rows = Student.get()
-
-        students = []
-        if rows:
-            for row in rows:
-                students.append(row._json())
-
+        students = Student.get()
         return {
-            'message': f'There are {len(students)} student(s) found',
-            'students': students
+            'code': 200,
+            'students': list(student._json() for student in students)
         }, 200
 
     # Register new student
@@ -79,9 +93,14 @@ class StudentsResource(Resource):
     def post(self):
         data = StudentsResource.parser.parse_args()
 
-        student = Student(_id=None, name=data['name'])
+        student = Student(
+            _id=None,
+            name=data['name'],
+            school_id=data['school_id']
+        )
         student.save()
 
         return {
-            'message': 'Student created successfully'
+            'code': 201,
+            'message': 'Student data created successfully'
         }, 201

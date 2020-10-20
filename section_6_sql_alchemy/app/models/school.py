@@ -1,47 +1,38 @@
 from database import db
 
 
-class Student(db.Model):
-    __tablename__ = 'students'
+class School(db.Model):
+    __tablename__ = 'schools'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
 
-    school_id = db.Column(db.Integer, db.ForeignKey('schools.id'))
-    school = db.relationship('School')
+    students = db.relationship('Student', lazy='dynamic')
 
-    def __init__(self, _id: int, name: str, school_id: int = None):
-        self.id = _id
+    def __init__(self, id: int, name: str):
+        self.id = id
         self.name = name
-        self.school_id = school_id
 
-    # Memformat data kedalam format JSON
+    # Memformat data kedalam bentuk json
     def _json(self):
         return {
             'id': self.id,
-            'name': self.name
+            'name': self.name,
+            'students': [student._json() for student in self.students.all()]
         }
 
     # Menampilkan semua data
     @classmethod
-    def get(cls):
+    def all(cls):
         return cls.query.order_by(cls.name).all()
 
     # Menampilkan data berdasarkan id
     @classmethod
     def find(cls, id: int):
         return cls.query.filter_by(id=id).first()
-
+    
     # Menyimpan data (Insert & Update)
     def save(self):
         db.session.add(self)
         db.session.commit()
-        return None
-
-    # Menghapus data berdasarkan id
-    @classmethod
-    def delete(cls, id: int):
-        cls.query.filter_by(id=id).delete()
-        db.session.commit()
-
         return None
