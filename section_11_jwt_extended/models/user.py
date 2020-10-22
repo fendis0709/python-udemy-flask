@@ -15,6 +15,14 @@ class UserModel(db.Model):
         self.email = email
         self.password = password
 
+    # Memformat data kedalam JSON
+    def _json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email
+        }
+
     # Menampilkan data berdasarkan id
     @classmethod
     def find(cls, _id):

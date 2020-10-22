@@ -7,7 +7,7 @@ class SchoolModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
 
-    students = db.relationship('Student', lazy='dynamic')
+    students = db.relationship('StudentModel', lazy='dynamic')
 
     def __init__(self, id: int, name: str):
         self.id = id

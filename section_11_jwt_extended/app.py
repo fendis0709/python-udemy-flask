@@ -44,14 +44,18 @@ def custom_error_handler(error):
         'message': error.description
     }), error.status_code
 
+@app.route('/')
+def hello():
+    return 'Hello, World!'
+
 
 api = Api(app)
 api.add_resource(Students, '/students')
 api.add_resource(Student, '/students/<int:id>')
 api.add_resource(Schools, '/schools')
 api.add_resource(School, '/schools/<int:id>')
-api.add_resource(User, '/users')
-api.add_resource(Users, '/users/<int:id>')
+api.add_resource(Users, '/users')
+api.add_resource(User, '/users/<int:id>')
 
 db.init_app(app)
 
