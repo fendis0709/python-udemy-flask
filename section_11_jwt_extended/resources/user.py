@@ -1,27 +1,46 @@
-from flask_restful import Resource, reqparse
-from models.user import UserModel
+from flask_restful import Resource, reqparse, request
+from models.user import UserModel as User
 
 
-class UserRegister(Resource):
+class UserResource(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('username',
-                        type=str,
-                        required=True,
-                        help="This field cannot be blank."
-                        )
-    parser.add_argument('password',
-                        type=str,
-                        required=True,
-                        help="This field cannot be blank."
-                        )
+    parser.add_argument(
+        'name',
+        type=str,
+        required=True,
+        help='This field is required'
+    )
+    parser.add_argument(
+        'email',
+        type=str,
+        required=True,
+        help='This field is required'
+    )
+    parser.add_argument(
+        'password',
+        type=str,
+        required=True,
+        help='This field is required'
+    )
 
+    # Mendaftarkan akun pengguna baru
     def post(self):
-        data = UserRegister.parser.parse_args()
+        _input = UserResource.parser.parse_args()
 
-        if UserModel.find_by_username(data['username']):
-            return {"message": "A user with that username already exists"}, 400
+        user = User.find_by_email(_input['email'])
+        if user:
+            return {
+                'message': f"A user with email '{_input['email']}' already exists"
+            }, 400
 
-        user = UserModel(data['username'], data['password'])
-        user.save_to_db()
+        user = User(
+            _id=None,
+            name=_input['name'],
+            email=_input['email'],
+            password=_input['password']
+        )
+        user.save()
 
-        return {"message": "User created successfully."}, 201
+        return {
+            'message': 'User successfully created'
+        }, 201
