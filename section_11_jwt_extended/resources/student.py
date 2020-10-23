@@ -1,5 +1,5 @@
 from flask import request
-from flask_jwt_extended import jwt_required, get_jwt_claims
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_claims, get_jwt_identity
 from flask_restful import Resource, reqparse
 from models.student import StudentModel as Student
 
@@ -88,7 +88,15 @@ class StudentsResource(Resource):
     )
 
     # Get all students
+    @jwt_optional
     def get(self):
+        user_id = get_jwt_identity()
+        if user_id is None:
+            return {
+                'code': 200,
+                'students': []
+            }, 200
+
         students = Student.get()
         return {
             'code': 200,

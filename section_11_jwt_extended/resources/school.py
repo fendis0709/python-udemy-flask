@@ -1,4 +1,4 @@
-from flask_jwt_extended import jwt_required, get_jwt_claims
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_claims, get_jwt_identity
 from flask_restful import Resource, reqparse
 from models.school import SchoolModel as School
 
@@ -83,7 +83,15 @@ class SchoolsResource(Resource):
     )
 
     # Menampilkan semua data sekolah
+    @jwt_optional
     def get(self):
+        user_id = get_jwt_identity()
+        if user_id is None :
+            return {
+                'code': 200,
+                'schools': []
+            }, 200
+
         schools = School.all()
         return {
             'code': 200,
