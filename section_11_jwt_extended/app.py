@@ -1,10 +1,10 @@
-from blacklist import BLACKLIST
+from blacklist import BLACKLIST_JWT_ID, BLACKLIST_USER_ID
 from database import db
 from datetime import timedelta
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
-from resources.user import UserResource as User, UsersResource as Users, UserAuth, RefreshToken
+from resources.user import UserResource as User, UsersResource as Users, UserAuth, UserLogout, RefreshToken
 from resources.student import StudentResource as Student, StudentsResource as Students
 from resources.school import SchoolResource as School, SchoolsResource as Schools
 
@@ -89,11 +89,12 @@ def revoked_token_callback():
 # Check if token user has blacklisted
 @jwt.token_in_blacklist_loader
 def is_token_blacklisted_callback(decrypted_token):
-    return decrypted_token['identity'] in BLACKLIST
+    return (decrypted_token['identity'] in BLACKLIST_USER_ID) or (decrypted_token['jti'] in BLACKLIST_JWT_ID)
 
 
 api = Api(app)
 api.add_resource(UserAuth, '/login')
+api.add_resource(UserLogout, '/logout')
 api.add_resource(RefreshToken, '/refresh-token')
 api.add_resource(Students, '/students')
 api.add_resource(Student, '/students/<int:id>')
