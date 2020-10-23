@@ -30,9 +30,16 @@ class SchoolModel(db.Model):
     @classmethod
     def find(cls, id: int):
         return cls.query.filter_by(id=id).first()
-    
+
     # Menyimpan data (Insert & Update)
     def save(self):
         db.session.add(self)
+        db.session.commit()
+        return None
+
+    # Menghapus data berdasarkan id
+    @classmethod
+    def delete(cls, id: int):
+        cls.query.filter_by(id=id).delete()
         db.session.commit()
         return None

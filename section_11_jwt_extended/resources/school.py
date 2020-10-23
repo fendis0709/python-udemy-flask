@@ -1,4 +1,4 @@
-from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_claims, get_jwt_identity
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_claims, get_jwt_identity, fresh_jwt_required
 from flask_restful import Resource, reqparse
 from models.school import SchoolModel as School
 
@@ -48,15 +48,8 @@ class SchoolResource(Resource):
         }, 200
 
     # Menghapus data sekolah berdasarkan id
-    @jwt_required
+    @fresh_jwt_required
     def delete(self, id):
-        claims = get_jwt_claims()
-        if claims['is_admin'] is not True :
-            return {
-                'code': 403,
-                'message': 'You shall not pass!'
-            }, 403
-
         school = School.find(id)
         if school is None:
             return {
@@ -64,8 +57,7 @@ class SchoolResource(Resource):
                 'message': 'School data not found'
             }, 400
 
-        school.delete()
-
+        School.delete(id)
         return {
             'code': 200,
             'message': 'School data deleted successfully'

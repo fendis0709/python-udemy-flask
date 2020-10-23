@@ -3,7 +3,7 @@ from datetime import timedelta
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
-from resources.user import UserResource as User, UsersResource as Users, UserAuth
+from resources.user import UserResource as User, UsersResource as Users, UserAuth, RefreshToken
 from resources.student import StudentResource as Student, StudentsResource as Students
 from resources.school import SchoolResource as School, SchoolsResource as Schools
 
@@ -36,6 +36,7 @@ def add_jwt_claim(identity):
 
 api = Api(app)
 api.add_resource(UserAuth, '/login')
+api.add_resource(RefreshToken, '/refresh-token')
 api.add_resource(Students, '/students')
 api.add_resource(Student, '/students/<int:id>')
 api.add_resource(Schools, '/schools')

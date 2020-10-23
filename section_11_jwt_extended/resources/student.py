@@ -1,5 +1,5 @@
 from flask import request
-from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_claims, get_jwt_identity
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_claims, get_jwt_identity, fresh_jwt_required
 from flask_restful import Resource, reqparse
 from models.student import StudentModel as Student
 
@@ -55,17 +55,16 @@ class StudentResource(Resource):
         }, 200
 
     # Delete student by ID
-    @jwt_required
+    @fresh_jwt_required
     def delete(self, id):
-        claims = get_jwt_claims()
-        if claims['is_admin'] is not True:
+        student = Student.find(id)
+        if student is None:
             return {
-                'code': 403,
-                'message': 'You shall not pass!'
-            }, 403
+                'code': 400,
+                'message': 'School data not found'
+            }, 400
 
         Student.delete(id)
-
         return {
             'code': 200,
             'message': 'Student data successfully deleted'

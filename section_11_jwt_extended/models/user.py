@@ -38,3 +38,9 @@ class UserModel(db.Model):
         db.session.add(self)
         db.session.commit()
         return None
+
+    # Menghapus data
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return None
