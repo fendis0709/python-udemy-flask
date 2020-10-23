@@ -19,9 +19,13 @@ app.secret_key = app.config['JWT_SECRET_KEY']
 
 jwt = JWTManager(app)
 
+
 @app.route('/')
 def hello():
     return 'Hello, World!'
+
+# Append new data to JWT
+
 
 @jwt.user_claims_loader
 def add_jwt_claim(identity):
@@ -32,6 +36,52 @@ def add_jwt_claim(identity):
     return {
         'is_admin': False
     }
+
+# Handler token JWT expired
+
+
+@jwt.expired_token_loader
+def expired_token_callback():
+    return jsonify({
+        'code': 401,
+        'message': 'Token has been expired'
+    }), 401
+
+# Invalid token JWT
+
+
+@jwt.invalid_token_loader
+def invalid_token_callback():
+    return jsonify({
+        'code': 401,
+        'message': 'Token invalid'
+    }), 401
+
+# No token JWT provided from user
+
+
+@jwt.unauthorized_loader
+def not_provided_token_callback():
+    return jsonify({
+        'code': 401,
+        'message': 'Token required'
+    }), 401
+
+
+@jwt.needs_fresh_token_loader
+def require_fresh_token_callback():
+    return jsonify({
+        'code': 401,
+        'message': 'Fresh token requires'
+    }), 401
+
+
+@jwt.revoked_token_loader
+def revoked_token_callback():
+    return jsonify({
+        'code': 401,
+        'message': 'Token is expired'
+    }), 401
 
 
 api = Api(app)
