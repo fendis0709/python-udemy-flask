@@ -23,6 +23,16 @@ jwt = JWTManager(app)
 def hello():
     return 'Hello, World!'
 
+@jwt.user_claims_loader
+def add_jwt_claim(identity):
+    if identity == 1:
+        return {
+            'is_admin': True
+        }
+    return {
+        'is_admin': False
+    }
+
 
 api = Api(app)
 api.add_resource(UserAuth, '/login')
