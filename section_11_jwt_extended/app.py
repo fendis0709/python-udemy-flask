@@ -1,3 +1,4 @@
+from blacklist import BLACKLIST
 from database import db
 from datetime import timedelta
 from flask import Flask, jsonify
@@ -10,10 +11,13 @@ from resources.school import SchoolResource as School, SchoolsResource as School
 
 app = Flask(__name__)
 
-app.config['JWT_SECRET_KEY'] = 'helloworld'
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config['JWT_SECRET_KEY'] = 'helloworld'
+app.config['JWT_BLACKLIST_ENABLED'] = True
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
 app.secret_key = app.config['JWT_SECRET_KEY']
 
@@ -24,9 +28,8 @@ jwt = JWTManager(app)
 def hello():
     return 'Hello, World!'
 
+
 # Append new data to JWT
-
-
 @jwt.user_claims_loader
 def add_jwt_claim(identity):
     if identity == 1:
@@ -37,9 +40,8 @@ def add_jwt_claim(identity):
         'is_admin': False
     }
 
+
 # Handler token JWT expired
-
-
 @jwt.expired_token_loader
 def expired_token_callback():
     return jsonify({
@@ -47,9 +49,8 @@ def expired_token_callback():
         'message': 'Token has been expired'
     }), 401
 
+
 # Invalid token JWT
-
-
 @jwt.invalid_token_loader
 def invalid_token_callback():
     return jsonify({
@@ -57,9 +58,8 @@ def invalid_token_callback():
         'message': 'Token invalid'
     }), 401
 
+
 # No token JWT provided from user
-
-
 @jwt.unauthorized_loader
 def not_provided_token_callback():
     return jsonify({
@@ -68,6 +68,7 @@ def not_provided_token_callback():
     }), 401
 
 
+# Require fresh token JWT
 @jwt.needs_fresh_token_loader
 def require_fresh_token_callback():
     return jsonify({
@@ -76,12 +77,19 @@ def require_fresh_token_callback():
     }), 401
 
 
+# Token JWT has expired
 @jwt.revoked_token_loader
 def revoked_token_callback():
     return jsonify({
         'code': 401,
         'message': 'Token is expired'
     }), 401
+
+
+# Check if token user has blacklisted
+@jwt.token_in_blacklist_loader
+def is_token_blacklisted_callback(decrypted_token):
+    return decrypted_token['identity'] in BLACKLIST
 
 
 api = Api(app)
