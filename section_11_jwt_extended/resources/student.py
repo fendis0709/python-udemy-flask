@@ -1,5 +1,5 @@
 from flask import request
-from flask_jwt import jwt_required
+from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from models.student import StudentModel as Student
 
@@ -34,7 +34,7 @@ class StudentResource(Resource):
         }, 200
 
     # Update student by ID
-    @jwt_required()
+    @jwt_required
     def put(self, id):
         data = StudentResource.parser.parse_args()
 
@@ -55,7 +55,7 @@ class StudentResource(Resource):
         }, 200
 
     # Delete student by ID
-    @jwt_required()
+    @jwt_required
     def delete(self, id):
         Student.delete(id)
 
@@ -89,7 +89,7 @@ class StudentsResource(Resource):
         }, 200
 
     # Register new student
-    @jwt_required()
+    @jwt_required
     def post(self):
         data = StudentsResource.parser.parse_args()
 

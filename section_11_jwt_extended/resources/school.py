@@ -1,3 +1,4 @@
+from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
 from models.school import SchoolModel as School
 
@@ -27,6 +28,7 @@ class SchoolResource(Resource):
         }, 200
 
     # Memperbarui data sekolah berdasarkan id
+    @jwt_required
     def put(self, id):
         _input = SchoolResource.parser.parse_args()
 
@@ -45,6 +47,8 @@ class SchoolResource(Resource):
             'message': 'School data updated successfully'
         }, 200
 
+    # Menghapus data sekolah berdasarkan id
+    @jwt_required
     def delete(self, id):
         school = School.find(id)
         if school is None:
@@ -80,6 +84,7 @@ class SchoolsResource(Resource):
         }, 200
 
     # Mendaftarkan data sekolah
+    @jwt_required
     def post(self):
         _input = SchoolsResource.parser.parse_args()
 
